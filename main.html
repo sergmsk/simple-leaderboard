@@ -1,0 +1,38 @@
+<head>
+    <title>Leaderboard</title>
+</head>
+<body>
+    <h1>Leaderboard</h1>
+    {{> addPlayerForm}}
+    
+    {{> leaderboard }}
+    <h4>Всего игроков: {{>counter}}</h4>
+</body>
+
+<template name="leaderboard">
+<ul>
+    {{#each player}}
+        <li class="player {{selectedClass}}">{{name}}: {{score}}</li>
+    {{/each}}
+    
+    {{#if selectedPlayer}}
+    <li>Selected Player: {{selectedPlayer.name}}</li>
+    <li>
+    <button class="increment">Give 5 Points</button>
+    <button class="decrement">Take 5 Points</button>
+    </li>
+    <button class="remove">Remove Player</button>
+    {{/if}}
+</ul>
+
+</template>
+
+<template name="counter">{{con}}</template>
+
+<template name="addPlayerForm">
+    <form>
+        <input type="text" name="playerName" value="Введите имя игрока">
+        <input type="text" name="playerPoints" value="Очки">
+        <input type="submit" value="Добавить игрока">
+    </form>
+</template>
