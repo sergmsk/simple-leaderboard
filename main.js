@@ -12,6 +12,13 @@ Meteor.methods({
                 createdBy: currentUserId
             });
         }
+    },
+    'removePlayer': function(selectedPlayer){
+        check(selectedPlayer, String);
+        var currentUserId = Meteor.userId();
+        if(currentUserId){    
+            if(confirm("Вы уверены?")){ PlayersList.remove({_id:selectedPlayer, createdBy: currentUserId }); }
+        }
     }
 });
 
@@ -60,9 +67,8 @@ if(Meteor.isClient){
         },
         'click .remove':function(){
             var selectedPlayer = Session.get('selectedPlayer');//получить уникальный идентификатор выбранного игрока
-            if(confirm("Вы уверены?")){
-            PlayersList.remove({_id:selectedPlayer});
-            }
+            //if(confirm("Вы уверены?")){ PlayersList.remove({_id:selectedPlayer}); }
+            Meteor.call('removePlayer', selectedPlayer);
         },
     });
 
