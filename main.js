@@ -56,11 +56,14 @@ if(Meteor.isClient){
             //console.log("Добавление игрока");
             //console.log(playerNameVar);
             //console.log(event.type);
+            var currentUserId = Meteor.userId();
             PlayersList.insert({
                 name: playerNameVar,
-                score: playerPointsVar
+                score: playerPointsVar,
+                createdBy: currentUserId
             });
             event.target.playerName.value = '';
+            event.target.playerPoints.value = 0;
         }
     });
 
