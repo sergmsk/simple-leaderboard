@@ -3,7 +3,9 @@ if(Meteor.isClient){
     
     Template.leaderboard.helpers({
         'player': function(){
-            return PlayersList.find({}, { sort: {score: -1,name:1} });
+            var currentUserId = Meteor.userId();
+            return PlayersList.find({ createdBy:currentUserId}, 
+                                    { sort: {score: -1,name:1} });
         },
         'selectedClass': function(){
             var playerId = this._id;
@@ -70,6 +72,6 @@ if(Meteor.isClient){
 };
 
 if(Meteor.isServer){
-    //console.log(a);
+    Meteor.publish();
 };
 var a = 0;
