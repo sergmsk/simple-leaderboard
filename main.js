@@ -19,7 +19,16 @@ Meteor.methods({
         if(currentUserId){    
             if(confirm("Вы уверены?")){ PlayersList.remove({_id:selectedPlayer, createdBy: currentUserId }); }
         }
-    }
+    },
+    'updateScore':function(selectedPlayer){
+        check(selectedPlayer, String);
+        check(scoreValue, Number);
+        var currentUserId = Meteor.userId();
+        if(currentUserId){
+            PlayersList.update( { _id: selectedPlayer, createdBy : currentUserId },
+                                { $inc: { score: scoreValue } });
+        }
+    },
 });
 
 if(Meteor.isClient){
@@ -59,16 +68,18 @@ if(Meteor.isClient){
         },
         'click .increment': function(){
             var selectedPlayer = Session.get('selectedPlayer'); //получить уникальный идентификатор выбранного игрока
-            PlayersList.update({ _id: selectedPlayer },{ $inc: { score: 5 } });
+            //PlayersList.update({ _id: selectedPlayer },{ $inc: { score: 5 } });
+            Meteor.call('updateScore',selectedPlayer);
         },
         'click .decrement': function(){
             var selectedPlayer = Session.get('selectedPlayer');//получить уникальный идентификатор выбранного игрока
-            PlayersList.update({ _id: selectedPlayer }, {$inc: {score: -5} });
+            //PlayersList.update({ _id: selectedPlayer }, {$inc: {score: -5} });
+            Meteor.call('updateScore', selectedPlayer, -5);
         },
         'click .remove':function(){
             var selectedPlayer = Session.get('selectedPlayer');//получить уникальный идентификатор выбранного игрока
             //if(confirm("Вы уверены?")){ PlayersList.remove({_id:selectedPlayer}); }
-            Meteor.call('removePlayer', selectedPlayer);
+            Meteor.call('removePlayer', selectedPlayer, 5);
         },
     });
 
