@@ -2,6 +2,7 @@ PlayersList = new Mongo.Collection('players');
 
 Meteor.methods({
     'createPlayer': function(){
+        check();
         var currentUserId = Meteor.userId();
         PlayersList.insert({
             name: playerNameVar,
