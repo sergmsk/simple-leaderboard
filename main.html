@@ -2,12 +2,14 @@
     <title>Leaderboard</title>
 </head>
 <body>
-    {{> loginButtons}}
     <h1>Leaderboard</h1>
+    <p>{{> loginButtons}}</p>
+    {{#if currentUser}}
     {{> addPlayerForm}}
     
     {{> leaderboard }}
     <h4>Всего игроков: {{>counter}}</h4>
+    {{/if}}
 </body>
 
 <template name="leaderboard">
