@@ -1,4 +1,16 @@
 PlayersList = new Mongo.Collection('players');
+
+Meteor.methods({
+    'createPlayer': function(){
+        var currentUserId = Meteor.userId();
+        PlayersList.insert({
+            name: playerNameVar,
+            score: playerPointsVar,
+            createdBy: currentUserId
+        });
+    }
+});
+
 if(Meteor.isClient){
     
     Meteor.subscribe('thePlayers');
@@ -60,12 +72,11 @@ if(Meteor.isClient){
             //console.log("Добавление игрока");
             //console.log(playerNameVar);
             //console.log(event.type);
-            var currentUserId = Meteor.userId();
-            PlayersList.insert({
-                name: playerNameVar,
-                score: playerPointsVar,
-                createdBy: currentUserId
-            });
+            //var currentUserId = Meteor.userId();
+            Meteor.call('createPlayer', playerNameVar, playerPointsVar);
+            
+            //PlayersList.insert({ name: playerNameVar,score: playerPointsVar,createdBy: currentUserId});
+            
             event.target.playerName.value = '';
             event.target.playerPoints.value = 0;
         }
