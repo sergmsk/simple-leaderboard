@@ -1,16 +1,16 @@
 PlayersList = new Mongo.Collection('players');
 
 Meteor.methods({
-    'createPlayer': function(){
+    'createPlayer': function(playerNameVar, playerPointsVar){
         check(playerNameVar, String);
         check(playerPointsVar, Number);
         var currentUserId = Meteor.userId();
-        if(currentId){
+        if(currentUserId){
             PlayersList.insert({
                 name: playerNameVar,
                 score: playerPointsVar,
                 createdBy: currentUserId
-        });
+            });
         }
     }
 });
