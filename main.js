@@ -1,9 +1,13 @@
 PlayersList = new Mongo.Collection('players');
 if(Meteor.isClient){
     
+    Meteor.subscribe('thePlayers');
+    
     Template.leaderboard.helpers({
         'player': function(){
-            return PlayersList.find({}, { sort: {score: -1,name:1} });
+            var currentUserId = Meteor.userId();
+            return PlayersList.find({ createdBy:currentUserId}, 
+                                    { sort: {score: -1,name:1} });
         },
         'selectedClass': function(){
             var playerId = this._id;
@@ -51,21 +55,27 @@ if(Meteor.isClient){
         'submit form': function(event){
             event.preventDefault();//предотвращение поведения по умолчанию, т.е.обновление страницы при отправке формы
             var playerNameVar = event.target.playerName.value;//имя нового игрока
-            var playerPointsVar = event.target.playerPoints.value;//очки нового игрока
+            var playerPointsVar = parseInt(event.target.playerPoints.value);//очки нового игрока
+            if (isNaN(playerPointsVar)) playerPointsVar=0;
             //console.log("Добавление игрока");
             //console.log(playerNameVar);
             //console.log(event.type);
+            var currentUserId = Meteor.userId();
             PlayersList.insert({
                 name: playerNameVar,
-                score: playerPointsVar
+                score: playerPointsVar,
+                createdBy: currentUserId
             });
             event.target.playerName.value = '';
+            event.target.playerPoints.value = 0;
         }
     });
 
 };
 
 if(Meteor.isServer){
-    //console.log(a);
+    Meteor.publish('thePlayers', function(){
+    return PlayersList.find();
+});
 };
 var a = 0;
