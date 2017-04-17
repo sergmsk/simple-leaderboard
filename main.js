@@ -1,9 +1,45 @@
 PlayersList = new Mongo.Collection('players');
+
+Meteor.methods({
+    'createPlayer': function(playerNameVar, playerPointsVar){
+        check(playerNameVar, String);
+        check(playerPointsVar, Number);
+        var currentUserId = Meteor.userId();
+        if(currentUserId){
+            PlayersList.insert({
+                name: playerNameVar,
+                score: playerPointsVar,
+                createdBy: currentUserId
+            });
+        }
+    },
+    'removePlayer': function(selectedPlayer){
+        check(selectedPlayer, String);
+        var currentUserId = Meteor.userId();
+        if(currentUserId){    
+            PlayersList.remove({ _id: selectedPlayer, createdBy: currentUserId }); 
+        }
+    },
+    'updateScore':function(selectedPlayer, scoreValue){
+        check(selectedPlayer, String);
+        check(scoreValue, Number);
+        var currentUserId = Meteor.userId();
+        if(currentUserId){
+            PlayersList.update( { _id: selectedPlayer, createdBy: currentUserId },
+                                { $inc: {score: scoreValue} });
+        }
+    },
+});
+
 if(Meteor.isClient){
     
+    Meteor.subscribe('thePlayers');
+
     Template.leaderboard.helpers({
         'player': function(){
-            return PlayersList.find({}, { sort: {score: -1,name:1} });
+            var currentUserId = Meteor.userId();
+            return PlayersList.find({ createdBy:currentUserId}, 
+                                    { sort: {score: -1,name:1} });
         },
         'selectedClass': function(){
             var playerId = this._id;
@@ -32,17 +68,18 @@ if(Meteor.isClient){
         },
         'click .increment': function(){
             var selectedPlayer = Session.get('selectedPlayer'); //получить уникальный идентификатор выбранного игрока
-            PlayersList.update({ _id: selectedPlayer },{ $inc: { score: 5 } });
+            //PlayersList.update({ _id: selectedPlayer },{ $inc: { score: 5 } });
+            Meteor.call('updateScore',selectedPlayer, 5);
         },
         'click .decrement': function(){
             var selectedPlayer = Session.get('selectedPlayer');//получить уникальный идентификатор выбранного игрока
-            PlayersList.update({ _id: selectedPlayer }, {$inc: {score: -5} });
+            //PlayersList.update({ _id: selectedPlayer }, {$inc: {score: -5} });
+            Meteor.call('updateScore', selectedPlayer, -5);
         },
         'click .remove':function(){
             var selectedPlayer = Session.get('selectedPlayer');//получить уникальный идентификатор выбранного игрока
-            if(confirm("Вы уверены?")){
-            PlayersList.remove({_id:selectedPlayer});
-            }
+            //if(confirm("Вы уверены?")){ PlayersList.remove({_id:selectedPlayer}); }
+            Meteor.call('removePlayer', selectedPlayer, 5);
         },
     });
 
@@ -51,21 +88,27 @@ if(Meteor.isClient){
         'submit form': function(event){
             event.preventDefault();//предотвращение поведения по умолчанию, т.е.обновление страницы при отправке формы
             var playerNameVar = event.target.playerName.value;//имя нового игрока
-            var playerPointsVar = event.target.playerPoints.value;//очки нового игрока
+            var playerPointsVar = parseInt(event.target.playerPoints.value);//очки нового игрока
+            if (isNaN(playerPointsVar)) playerPointsVar=0;
             //console.log("Добавление игрока");
             //console.log(playerNameVar);
             //console.log(event.type);
-            PlayersList.insert({
-                name: playerNameVar,
-                score: playerPointsVar
-            });
+            //var currentUserId = Meteor.userId();
+            Meteor.call('createPlayer', playerNameVar, playerPointsVar);
+            
+            //PlayersList.insert({ name: playerNameVar,score: playerPointsVar,createdBy: currentUserId});
+            
             event.target.playerName.value = '';
+            event.target.playerPoints.value = 0;
         }
     });
 
 };
 
 if(Meteor.isServer){
-    //console.log(a);
+    Meteor.publish('thePlayers', function(){
+        var currentUserId = this.userId;
+        return PlayersList.find({createdBy:currentUserId});
+});
 };
 var a = 0;
