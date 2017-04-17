@@ -51,7 +51,8 @@ if(Meteor.isClient){
         'submit form': function(event){
             event.preventDefault();//предотвращение поведения по умолчанию, т.е.обновление страницы при отправке формы
             var playerNameVar = event.target.playerName.value;//имя нового игрока
-            var playerPointsVar = +event.target.playerPoints.value;//очки нового игрока
+            var playerPointsVar = parseInt(event.target.playerPoints.value);//очки нового игрока
+            if (isNaN(playerPointsVar)) playerPointsVar=0;
             //console.log("Добавление игрока");
             //console.log(playerNameVar);
             //console.log(event.type);
